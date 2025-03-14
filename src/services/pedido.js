@@ -1,25 +1,17 @@
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable quotes */
+/* eslint-disable semi */
 const PDFDocument = require('pdfkit');
 const fs = require("fs");
 const axios = require('axios');
 // Função para adicionar o rodapé
-function addFooter(doc, pageNumber) {
-  const footerText = `Página ${pageNumber}`;
-  const footerHeight = 30; // Altura do rodapé
 
-  // Posicionando o rodapé no final da página
-  doc.fontSize(10)
-     .text(footerText, 50, doc.page.height - footerHeight, { align: 'center' });
-}
-
-// Função para converter para Title Case
-function titleCase(str) {
+function titleCase (str) {
   return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-
-
-async function gerarPDF(dadosPedido) {
-  return new Promise(async (resolve, reject) => {
+async function gerarPDF (dadosPedido) {
+  return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: 'A4', margin: 20 });
     const filePath = `${dadosPedido.cabecalho.tituloPedido}.pdf`;
     const stream = fs.createWriteStream(filePath);
@@ -29,9 +21,8 @@ async function gerarPDF(dadosPedido) {
     // Cabeçalho com fundo azul
     doc.rect(0, 0, doc.page.width, 80).fill('#002f87');
     doc.fillColor('white').fontSize(25).text(`${dadosPedido.cabecalho.fantasia}`, 10, 25, { width: 400, ellipsis: true });
-
     // Ajustando a cidade para Title Case
-const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
+    const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
     // Informações da empresa à direita
     doc.fillColor('white').fontSize(12).text(
       `${cidadeFormatada}\n${dadosPedido.cabecalho.numero}, ${dadosPedido.cabecalho.bairro}
@@ -42,17 +33,16 @@ const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
     );
 
     // Adicionando a imagem corretamente antes de continuar o processamento do PDF
-    async function getImageAsBase64(url) {
+    async function getImageAsBase64 (url) {
       const response = await axios.get(url, { responseType: 'arraybuffer' });
       return `data:image/png;base64,${Buffer.from(response.data).toString('base64')}`;
     }
-    try {
-      const base64Image = await getImageAsBase64(`${dadosPedido.cabecalho.logo}`);
+    getImageAsBase64(`${dadosPedido.cabecalho.logo}`).then(base64Image => {
       // Mova a imagem para a esquerda, por exemplo, 10 pixels a partir da borda esquerda
       doc.image(base64Image, doc.page.width - 100, 123, { width: 80 }); // Alterado para 10
-    } catch (error) {
+    }).catch(error => {
       console.error('Erro ao carregar imagem:', error);
-    }
+    });
     
     // Faixa de destaque
     doc.rect(0, 80, doc.page.width, 30).fill('#dbe4ff');
@@ -64,44 +54,42 @@ const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
     
     const cidadeClienFormatada = titleCase(dadosPedido.cabecalho.cidadeCliente);
     // Informações do pedido
-    doc.font('Helvetica-Bold').fillColor('black').fontSize(16).text(`${dadosPedido.cabecalho.nomeCliente}`, 10, 118,{ align: 'left' });
-   // doc.font('Helvetica-Bold').fillColor('black').fontSize(14).text(`Cliente: ${dadosPedido.cabecalho.nomeCliente}`, 110, 140);
-    doc.font('Helvetica').fontSize(14).text(`Cnpj/cpf: ${dadosPedido.cabecalho.cpfCnpj}`,10);
+    doc.font('Helvetica-Bold').fillColor('black').fontSize(16).text(`${dadosPedido.cabecalho.nomeCliente}`, 10, 118, { align: 'left' });
+    // doc.font('Helvetica-Bold').fillColor('black').fontSize(14).text(`Cliente: ${dadosPedido.cabecalho.nomeCliente}`, 110, 140);
+    doc.font('Helvetica').fontSize(14).text(`Cnpj/cpf: ${dadosPedido.cabecalho.cpfCnpj}`, 10);
     doc.font('Helvetica').text(`Telefone: ${dadosPedido.cabecalho.telefoneCliente}`);
     doc.font('Helvetica').text(`Cidade: ${cidadeClienFormatada}`);
     doc.font('Helvetica').text(`Status do pedido: ${dadosPedido.cabecalho.statusPedido}`);
-  
-    
-// Adicionando uma linha horizontal
-doc.strokeColor('#d6d6d6') // Define a cor da linha
-   .lineWidth(0.5) // Define a espessura da linha
-   .moveTo(10, 205) // Ponto inicial (x, y)
-   .lineTo(585, 205) // Ponto final (x, y) - mantenha o mesmo valor de y
-   .stroke(); // Desenha a linha
+
+    // Adicionando uma linha horizontal
+    doc.strokeColor('#d6d6d6') // Define a cor da linha
+      .lineWidth(0.5) // Define a espessura da linha
+      .moveTo(10, 205) // Ponto inicial (x, y)
+      .lineTo(585, 205) // Ponto final (x, y) - mantenha o mesmo valor de y
+      .stroke(); // Desenha a linha
 
     doc.moveDown();
 
-    doc.font('Helvetica').text(`Nº. Pedido: ${dadosPedido.cabecalho.idPedido}`,0,215,{ align: 'center' });
-    doc.rect(5, 245, doc.page.width-10, 30).fill('#ededed');
-    
-    doc.font('Helvetica-Bold').fontSize(13).fillColor('#525252').text(`Cod.`,10,255);
-    doc.text(`Descrição`,75,255);
-    doc.text(`Quant.`,210,255);
-    doc.text(`Valor`,275  ,255);
-    doc.text(`Uni.`,360,255);   
-    doc.text(`Desc. Uni.`,399,255);
-    doc.text(`Total`,505,255);
+    doc.font('Helvetica').text(`Nº. Pedido: ${dadosPedido.cabecalho.idPedido}`, 0, 215, { align: 'center' });
+    doc.rect(5, 245, doc.page.width - 10, 30).fill('#ededed');
+
+    doc.font('Helvetica-Bold').fontSize(13).fillColor('#525252').text(`Cod.`, 10, 255);
+    doc.text(`Descrição`, 75, 255);
+    doc.text(`Quant.`, 210, 255);
+    doc.text(`Valor`, 275, 255);
+    doc.text(`Uni.`, 360, 255);
+    doc.text(`Desc. Uni.`, 399, 255);
+    doc.text(`Total`, 505, 255);
 
     let startY = 278; // Posição Y inicial para a tabela
 
     // Linhas da tabela
-    dadosPedido.itens.forEach((item,index) => {
-         // Verifica se a posição Y está próxima do final da página
-         if (startY > doc.page.height - 70) { // Se estiver a 100 pixels do final
-       
-          doc.addPage(); // Adiciona uma nova página
-          startY = 40; // Reinicia a posição Y
-        }
+    dadosPedido.itens.forEach((item, index) => {
+      // Verifica se a posição Y está próxima do final da página
+      if (startY > doc.page.height - 70) { // Se estiver a 100 pixels do final
+        doc.addPage(); // Adiciona uma nova página
+        startY = 40; // Reinicia a posição Y
+      }
       // Configuração da descrição do produto
       const produtoText = `${item.produto}`;
       const textOptions = { width: 400, align: 'left' }; // Aumentando a largura para quase toda a linha
@@ -121,105 +109,93 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
       doc.text(`${item.valorUni}`, 275, adjustedY);
       doc.text(`${item.unidade}`, 360, adjustedY);
       doc.text(`${item.desconto}`, 399, adjustedY);
-      doc.fillColor('black').fontSize(13).text(`${item.total}`, 505, adjustedY ,{width :210} );
-    
+      doc.fillColor('black').fontSize(13).text(`${item.total}`, 505, adjustedY, { width: 210 });
   
-           // Se **não** for o último item, desenha a linha separadora
-  if (index < dadosPedido.itens.length - 1) {
-    doc.strokeColor('#d6d6d6')
-       .lineWidth(0.5)
-       .moveTo(10, adjustedY + 15)
-       .lineTo(750, adjustedY + 15) // Linha mais longa para acompanhar o novo layout
-       .stroke();
-  }
+      // Se **não** for o último item, desenha a linha separadora
+      if (index < dadosPedido.itens.length - 1) {
+        doc.strokeColor('#d6d6d6')
+          .lineWidth(0.5)
+          .moveTo(10, adjustedY + 15)
+          .lineTo(750, adjustedY + 15) // Linha mais longa para acompanhar o novo layout
+          .stroke();
+      }
     
       // Atualizando a posição para o próximo item
       startY = adjustedY + 25;
-
-      
     });
     
     doc.moveDown();
-    doc.rect(5, startY-5, doc.page.width-10, 90).fill('#dbe4ff');
+    doc.rect(5, startY - 5, doc.page.width - 10, 90).fill('#dbe4ff');
 
+    // Informações da empresa à direita
+    doc.fillColor('black').fontSize(14).text(
+      `${dadosPedido.cabecalho.observacao}`, 10, startY + 5, { width: 230, align: 'left' });
 
-     // Informações da empresa à direita
-     doc.fillColor('black').fontSize(14).text(
-      `${dadosPedido.cabecalho.observacao}`,10,startY+5,{  width: 230,align: 'left' } );
+    // Informações da empresa à direita
+    doc.fillColor('black').fontSize(14).text(
+        `Subtotal`, doc.page.width - 300, startY + 5, { align: 'left' });
 
-       // Informações da empresa à direita
-       doc.fillColor('black').fontSize(14).text(
-        `Subtotal`,doc.page.width - 300,startY+5,{ align: 'left' } );
-
-      doc.fillColor('black').fontSize(14).text(
+    doc.fillColor('black').fontSize(14).text(
         `${dadosPedido.cabecalho.subTotal}`,
-        doc.page.width - 300, startY+5,{ align: 'right' } );
-
+        doc.page.width - 300, startY + 5, { align: 'right' });
    
-        doc.fillColor('black').fontSize(14).text(
-          `Desc. Total dos Itens`,doc.page.width - 300,startY+25,{ align: 'left' } );
+    doc.fillColor('black').fontSize(14).text(
+          `Desc. Total dos Itens`, doc.page.width - 300, startY + 25, { align: 'left' });
   
-        doc.fillColor('black').fontSize(14).text(
+    doc.fillColor('black').fontSize(14).text(
           `${dadosPedido.cabecalho.descontoItens}`,
-          doc.page.width - 300, startY+25,{ align: 'right' } );
+          doc.page.width - 300, startY + 25, { align: 'right' });
 
-          doc.fillColor('black').fontSize(14).text(
-            `Desc. Venda`,doc.page.width - 300,startY+45,{ align: 'left' } );
+    doc.fillColor('black').fontSize(14).text(
+            `Desc. Venda`, doc.page.width - 300, startY + 45, { align: 'left' });
     
-          doc.fillColor('black').fontSize(14).text(
+    doc.fillColor('black').fontSize(14).text(
             `${dadosPedido.cabecalho.descontoPedido}`,
-            doc.page.width - 300, startY+45,{ align: 'right' } );   
+            doc.page.width - 300, startY + 45, { align: 'right' });   
             
-            doc.font('Helvetica-Bold').fillColor('black').fontSize(15).text(
-              `Total`,doc.page.width - 300,startY+65,{ align: 'left' } );
+    doc.font('Helvetica-Bold').fillColor('black').fontSize(15).text(
+              `Total`, doc.page.width - 300, startY + 65, { align: 'left' });
       
-            doc.fillColor('black').fontSize(15).text(
+    doc.fillColor('black').fontSize(15).text(
               `${dadosPedido.cabecalho.total}`,
-              doc.page.width - 300, startY+65,{ align: 'right' } );   
-   
-        
+              doc.page.width - 300, startY + 65, { align: 'right' });   
               
-      startY = startY +130; // Posição Y inicial para a tabela 
+    startY = startY + 130; // Posição Y inicial para a tabela 
     
-      doc.font('Helvetica-Bold').fillColor('black').fontSize(15).text(
-        `Meio de pagamento`,10,startY-18,{ align: 'left' } );
+    doc.font('Helvetica-Bold').fillColor('black').fontSize(15).text(
+        `Meio de pagamento`, 10, startY - 18, { align: 'left' });
     // Linhas da tabela
-    dadosPedido.pagamento.forEach((pagamento,index) => {
-         // Verifica se a posição Y está próxima do final da página
-         if (startY > doc.page.height - 70) { // Se estiver a 100 pixels do final
-       
-          doc.addPage(); // Adiciona uma nova página
-          startY = 40; // Reinicia a posição Y
-        }
+    dadosPedido.pagamento.forEach((pagamento, index) => {
+      // Verifica se a posição Y está próxima do final da página
+      if (startY > doc.page.height - 70) { // Se estiver a 100 pixels do final
+        doc.addPage(); // Adiciona uma nova página
+        startY = 40; // Reinicia a posição Y
+      }
       // Configuração da descrição do produto
       const meioText = `${pagamento.meio}`;
       const textOptions = { width: 400, align: 'left' }; 
       const textHeight = doc.heightOfString(meioText, textOptions); 
     
-         doc.font('Helvetica').fillColor('#525252').fontSize(14).text(meioText, 10, startY+5, textOptions);
-    
+      doc.font('Helvetica').fillColor('#525252').fontSize(14).text(meioText, 10, startY + 5, textOptions);
 
       const adjustedY = startY + textHeight + 15; 
 
-      doc.font('Helvetica').fillColor('#525252').fontSize(14).text(`${pagamento.valor}`, 210, startY +5 );
+      doc.font('Helvetica').fillColor('#525252').fontSize(14).text(`${pagamento.valor}`, 210, startY + 5);
      
-           // Se **não** for o último item, desenha a linha separadora
-  if (index < dadosPedido.pagamento.length - 1) {
-    doc.strokeColor('#d6d6d6')
-       .lineWidth(0.5)
-       .moveTo(10, adjustedY - 5)
-       .lineTo(300, adjustedY - 5) // Linha mais longa para acompanhar o novo layout
-       .stroke();
-  }
+      // Se **não** for o último item, desenha a linha separadora
+      if (index < dadosPedido.pagamento.length - 1) {
+        doc.strokeColor('#d6d6d6')
+          .lineWidth(0.5)
+          .moveTo(10, adjustedY - 5)
+          .lineTo(300, adjustedY - 5) // Linha mais longa para acompanhar o novo layout
+          .stroke();
+      }
     
       // Atualizando a posição para o próximo item
       startY = adjustedY + 5;
-
-      
     });     
    
-        doc.end();
-       
+    doc.end();
 
     stream.on('finish', () => {
       resolve(filePath);
@@ -230,9 +206,6 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
     });
   });
 }
-
-
-
 
 module.exports = {
   gerarPDF  
