@@ -121,7 +121,7 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
       doc.text(`${item.valorUni}`, 275, adjustedY);
       doc.text(`${item.unidade}`, 360, adjustedY);
       doc.text(`${item.desconto}`, 399, adjustedY);
-      doc.fillColor('black').fontSize(13).text(`${item.total}`, 510, adjustedY);
+      doc.fillColor('black').fontSize(13).text(`${item.total}`, 510, adjustedY ,{width :200} );
     
   
            // Se **não** for o último item, desenha a linha separadora
