@@ -90,7 +90,7 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
     doc.text(`Valor`,275  ,255);
     doc.text(`Uni.`,360,255);   
     doc.text(`Desc. Uni.`,399,255);
-    doc.text(`Total`,510,255);
+    doc.text(`Total`,505,255);
 
     let startY = 278; // Posição Y inicial para a tabela
 
@@ -121,7 +121,7 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
       doc.text(`${item.valorUni}`, 275, adjustedY);
       doc.text(`${item.unidade}`, 360, adjustedY);
       doc.text(`${item.desconto}`, 399, adjustedY);
-      doc.fillColor('black').fontSize(13).text(`${item.total}`, 510, adjustedY ,{width :200} );
+      doc.fillColor('black').fontSize(13).text(`${item.total}`, 505, adjustedY ,{width :210} );
     
   
            // Se **não** for o último item, desenha a linha separadora
