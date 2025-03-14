@@ -62,12 +62,13 @@ const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
     
     doc.moveDown(2);
     
+    const cidadeClienFormatada = titleCase(dadosPedido.cabecalho.cidadeCliente);
     // Informações do pedido
     doc.font('Helvetica-Bold').fillColor('black').fontSize(16).text(`${dadosPedido.cabecalho.nomeCliente}`, 10, 118,{ align: 'left' });
    // doc.font('Helvetica-Bold').fillColor('black').fontSize(14).text(`Cliente: ${dadosPedido.cabecalho.nomeCliente}`, 110, 140);
     doc.font('Helvetica').fontSize(14).text(`Cnpj/cpf: ${dadosPedido.cabecalho.cpfCnpj}`,10);
     doc.font('Helvetica').text(`Telefone: ${dadosPedido.cabecalho.telefoneCliente}`);
-    doc.font('Helvetica').text(`Cidade: ${dadosPedido.cabecalho.cidadeCliente}`);
+    doc.font('Helvetica').text(`Cidade: ${cidadeClienFormatada}`);
     doc.font('Helvetica').text(`Status do pedido: ${dadosPedido.cabecalho.statusPedido}`);
   
     
@@ -107,10 +108,10 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
       const textHeight = doc.heightOfString(produtoText, textOptions); // Altura do texto
     
       // Código do produto
-      doc.font('Helvetica').fillColor('black').fontSize(14).text(`${item.codigo}`, 10, startY);
+      doc.font('Helvetica').fillColor('black').fontSize(13).text(`${item.codigo}`, 10, startY);
     
       // Descrição do produto ocupa quase toda a linha
-      doc.font('Helvetica').fontSize(14).text(produtoText, 75, startY, textOptions);
+      doc.font('Helvetica').fontSize(13).text(produtoText, 75, startY, textOptions);
     
       // Ajustando a posição correta das demais colunas
       const adjustedY = startY + textHeight + 5; // Considera a altura da descrição do produto
