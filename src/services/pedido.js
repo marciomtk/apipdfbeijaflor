@@ -84,7 +84,7 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
     doc.font('Helvetica').text(`Nº. Pedido: ${dadosPedido.cabecalho.idPedido}`,0,215,{ align: 'center' });
     doc.rect(5, 245, doc.page.width-10, 30).fill('#ededed');
     
-    doc.font('Helvetica-Bold').fillColor('#525252').text(`Cod.`,10,255);
+    doc.font('Helvetica-Bold').fontSize(13).fillColor('#525252').text(`Cod.`,10,255);
     doc.text(`Descrição`,75,255);
     doc.text(`Quant.`,210,255);
     doc.text(`Valor`,275  ,255);
