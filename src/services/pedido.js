@@ -11,10 +11,17 @@ function addFooter(doc, pageNumber) {
      .text(footerText, 50, doc.page.height - footerHeight, { align: 'center' });
 }
 
+// Função para converter para Title Case
+function titleCase(str) {
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+
+
 async function gerarPDF(dadosPedido) {
   return new Promise(async (resolve, reject) => {
     const doc = new PDFDocument({ size: 'A4', margin: 20 });
-    const filePath = `pedido_${dadosPedido.cabecalho.id_pedido}.pdf`;
+    const filePath = `${dadosPedido.cabecalho.tituloPedido}.pdf`;
     const stream = fs.createWriteStream(filePath);
 
     doc.pipe(stream);
@@ -23,9 +30,11 @@ async function gerarPDF(dadosPedido) {
     doc.rect(0, 0, doc.page.width, 80).fill('#002f87');
     doc.fillColor('white').fontSize(25).text(`${dadosPedido.cabecalho.fantasia}`, 10, 25, { width: 400, ellipsis: true });
 
+    // Ajustando a cidade para Title Case
+const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
     // Informações da empresa à direita
     doc.fillColor('white').fontSize(12).text(
-      `${dadosPedido.cabecalho.cidadeEmpresa}\n${dadosPedido.cabecalho.numero}, ${dadosPedido.cabecalho.bairro}
+      `${cidadeFormatada}\n${dadosPedido.cabecalho.numero}, ${dadosPedido.cabecalho.bairro}
       ${dadosPedido.cabecalho.endereco} ${dadosPedido.cabecalho.estado} - ${dadosPedido.cabecalho.telefone}`,
       doc.page.width - 200,
       15,
@@ -49,7 +58,7 @@ async function gerarPDF(dadosPedido) {
     doc.rect(0, 80, doc.page.width, 30).fill('#dbe4ff');
     doc.font('Helvetica-Bold').fillColor('black').fontSize(14).text(`Vendedor: `, 10, 90);
     doc.font('Helvetica').text(` ${dadosPedido.cabecalho.nomeVendedor}`, 78, 90);
-    doc.fillColor('black').font('Helvetica').fontSize(14).text(`14/02/2025 07:16:34`, doc.page.width - 250, 90, { align: 'right' });
+    doc.fillColor('black').font('Helvetica').fontSize(14).text(` ${dadosPedido.cabecalho.dataPedido}`, doc.page.width - 250, 90, { align: 'right' });
     
     doc.moveDown(2);
     
@@ -60,6 +69,7 @@ async function gerarPDF(dadosPedido) {
     doc.font('Helvetica').text(`Telefone: ${dadosPedido.cabecalho.telefoneCliente}`);
     doc.font('Helvetica').text(`Cidade: ${dadosPedido.cabecalho.cidadeCliente}`);
     doc.font('Helvetica').text(`Status do pedido: ${dadosPedido.cabecalho.statusPedido}`);
+  
     
 // Adicionando uma linha horizontal
 doc.strokeColor('#d6d6d6') // Define a cor da linha
@@ -70,7 +80,7 @@ doc.strokeColor('#d6d6d6') // Define a cor da linha
 
     doc.moveDown();
 
-    doc.font('Helvetica').text(`Produtos`,0,230,{ align: 'center' });
+    doc.font('Helvetica').text(`Nº. Pedido: ${dadosPedido.cabecalho.idPedido}`,0,215,{ align: 'center' });
     doc.rect(5, 245, doc.page.width-10, 30).fill('#ededed');
     
     doc.font('Helvetica-Bold').fillColor('#525252').text(`Cod.`,10,255);
