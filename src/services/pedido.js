@@ -28,7 +28,7 @@ async function gerarPDF(dadosPedido) {
       `${dadosPedido.cabecalho.cidadeEmpresa}\n${dadosPedido.cabecalho.numero}, ${dadosPedido.cabecalho.bairro}
       ${dadosPedido.cabecalho.endereco} ${dadosPedido.cabecalho.estado} - ${dadosPedido.cabecalho.telefone}`,
       doc.page.width - 200,
-      25,
+      15,
       { align: 'right' }
     );
 
