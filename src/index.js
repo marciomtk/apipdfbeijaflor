@@ -35,4 +35,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Api Iniciada http://localhost:${port}`)
 })
-module.exports = app
