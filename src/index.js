@@ -32,4 +32,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({ message: err.message })
 })
 
-module.exports = app;
+app.listen(port, () => {
+  console.log(`Api Iniciada http://localhost:${port}`)
+})
+module.exports = app
