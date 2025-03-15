@@ -4,47 +4,53 @@
 const PDFDocument = require('pdfkit');
 const fs = require("fs");
 const axios = require('axios');
-// Função para adicionar o rodapé
 
-function titleCase (str) {
+// Função para adicionar o rodapé
+function titleCase(str) {
   return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-async function gerarPDF (dadosPedido) {
-  return new Promise((resolve, reject) => {
+async function getImageAsBase64(url) {
+  try {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const imageType = url.split('.').pop().toLowerCase(); // Extrai a extensão da imagem
+    return `data:image/${imageType};base64,${Buffer.from(response.data).toString('base64')}`;
+  } catch (error) {
+    console.error('Erro ao carregar imagem:', error);
+    throw error;
+  }
+}
+
+async function gerarPDF(dadosPedido) {
+  return new Promise(async (resolve, reject) => {
     const doc = new PDFDocument({ size: 'A4', margin: 20 });
     const filePath = `${dadosPedido.cabecalho.tituloPedido}.pdf`;
     const stream = fs.createWriteStream(filePath);
 
     doc.pipe(stream);
 
-    // Cabeçalho com fundo azul
-    doc.rect(0, 0, doc.page.width, 80).fill('#002f87');
-    doc.fillColor('white').fontSize(25).text(`${dadosPedido.cabecalho.fantasia}`, 10, 25, { width: 400, ellipsis: true });
-    // Ajustando a cidade para Title Case
-    const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
-    // Informações da empresa à direita
-    doc.fillColor('white').fontSize(12).text(
-      `${cidadeFormatada}\n${dadosPedido.cabecalho.numero}, ${dadosPedido.cabecalho.bairro}
-      ${dadosPedido.cabecalho.endereco} ${dadosPedido.cabecalho.estado} - ${dadosPedido.cabecalho.telefone}`,
-      doc.page.width - 200,
-      15,
-      { align: 'right' }
-    );
-
-    // Adicionando a imagem corretamente antes de continuar o processamento do PDF
-    async function getImageAsBase64 (url) {
-      const response = await axios.get(url, { responseType: 'arraybuffer' });
-      return `data:image/png;base64,${Buffer.from(response.data).toString('base64')}`;
-    }
-    getImageAsBase64(`${dadosPedido.cabecalho.logo}`).then(base64Image => {
-      // Mova a imagem para a esquerda, por exemplo, 10 pixels a partir da borda esquerda
-      doc.image(base64Image, doc.page.width - 100, 123, { width: 80 }); // Alterado para 10
-    }).catch(error => {
-      console.error('Erro ao carregar imagem:', error);
-    });
+        // Cabeçalho com fundo azul
+        doc.rect(0, 0, doc.page.width, 80).fill('#002f87');
+        doc.fillColor('white').fontSize(25).text(`${dadosPedido.cabecalho.fantasia}`, 10, 25, { width: 400, ellipsis: true });
+        // Ajustando a cidade para Title Case
+        const cidadeFormatada = titleCase(dadosPedido.cabecalho.cidadeEmpresa);
+        // Informações da empresa à direita
+        doc.fillColor('white').fontSize(12).text(
+          `${cidadeFormatada}\n${dadosPedido.cabecalho.numero}, ${dadosPedido.cabecalho.bairro}
+          ${dadosPedido.cabecalho.endereco} ${dadosPedido.cabecalho.estado} - ${dadosPedido.cabecalho.telefone}`,
+          doc.page.width - 200,
+          15,
+          { align: 'right' }
+        );
     
-    // Faixa de destaque
+
+    try {
+      const base64Image = await getImageAsBase64(`${dadosPedido.cabecalho.logo}`);
+      doc.image(base64Image, doc.page.width - 100, 123, { width: 80, height: 80 });
+    } catch (error) {
+      console.error('Erro ao carregar imagem:', error);
+    }
+
     doc.rect(0, 80, doc.page.width, 30).fill('#dbe4ff');
     doc.font('Helvetica-Bold').fillColor('black').fontSize(14).text(`Vendedor: `, 10, 90);
     doc.font('Helvetica').text(` ${dadosPedido.cabecalho.nomeVendedor}`, 78, 90);
@@ -194,7 +200,7 @@ async function gerarPDF (dadosPedido) {
       // Atualizando a posição para o próximo item
       startY = adjustedY + 5;
     });     
-   
+
     doc.end();
 
     stream.on('finish', () => {
@@ -208,5 +214,5 @@ async function gerarPDF (dadosPedido) {
 }
 
 module.exports = {
-  gerarPDF  
+  gerarPDF
 };
