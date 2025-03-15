@@ -31,6 +31,7 @@ app.use((err, req, res, next) => {
   console.error(err.message, err.stack)
   res.status(statusCode).json({ message: err.message })
 })
+
 app.listen(port, () => {
   console.log(`Api Iniciada http://localhost:${port}`)
 })
