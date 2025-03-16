@@ -187,11 +187,19 @@ async function gerarPDF(dadosPedido) {
       }
 
       // Atualizando a posição para o próximo item
-      startY = adjustedY + 25;
+      startY = adjustedY + 22;
     });
 
-    doc.moveDown();
-    doc.rect(5, startY - 5, doc.page.width - 10, 90).fill("#dbe4ff");
+    // iniciando rodape
+
+    const rodapeAltura = 90;
+    if (startY + rodapeAltura > doc.page.height - 20) {
+      doc.addPage(); // Adiciona uma nova página se não couber
+      startY = 40; // Reinicia a posição Y no topo da nova página
+    }
+
+    // Desenha o rodapé
+    doc.rect(5, startY - 5, doc.page.width - 10, rodapeAltura).fill("#dbe4ff");
 
     // Informações da empresa à direita
     doc
@@ -270,6 +278,12 @@ async function gerarPDF(dadosPedido) {
 
     startY = startY + 130; // Posição Y inicial para a tabela
 
+    if (startY > doc.page.height - 70) {
+      // Se estiver a 100 pixels do final
+      doc.addPage(); // Adiciona uma nova página
+      startY = 40; // Reinicia a posição Y
+    }
+
     doc
       .font("Helvetica-Bold")
       .fillColor("black")
@@ -278,11 +292,7 @@ async function gerarPDF(dadosPedido) {
     // Linhas da tabela
     dadosPedido.pagamento.forEach((pagamento, index) => {
       // Verifica se a posição Y está próxima do final da página
-      if (startY > doc.page.height - 70) {
-        // Se estiver a 100 pixels do final
-        doc.addPage(); // Adiciona uma nova página
-        startY = 40; // Reinicia a posição Y
-      }
+
       // Configuração da descrição do produto
       const meioText = `${pagamento.meio}`;
       const textOptions = { width: 400, align: "left" };
